@@ -19,7 +19,7 @@ this extension requires a simple backend that i made before so you need to insta
 first clone the repository with this command:
 
 ```bash
-git clone https://github.com/TheGod7/Instagram-Bot.git
+git clone https://github.com/TheGod7/youtube-firefox-extension.git
 ```
 
 then go to a firefox search bar and put this
