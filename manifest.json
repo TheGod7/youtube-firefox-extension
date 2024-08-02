@@ -1,5 +1,5 @@
 {
-  "manifest_version": 2,
+  "manifest_version": 3,
   "name": "Youtube Converter",
   "version": "1.0",
   "description": "Convert any video in youtube to mp3 or mp4",
@@ -11,10 +11,12 @@
     "tabs",
     "activeTab",
     "*://localhost/*",
-    "downloads"
+    "downloads",
+    "scripting"
   ],
+  "host_permissions": ["http://*/*", "https://*/*"],
   "background": {
-    "scripts": ["background.js"]
+    "service_worker": "background.js"
   },
   "content_scripts": [
     {

@@ -2,41 +2,45 @@ let mp4FormatOptions = [];
 let mp3FormatOptions = [];
 let CurrentVideoId;
 
-browser.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
-  if (message.action == "NewVideo") {
+chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
+  if (message.action === "NewVideo") {
     await FetchingFormats(message.video);
     CurrentVideoId = message.video;
-    if (!message.active) return;
 
-    browser.runtime.sendMessage({
-      action: "ShowConvertedOptions",
+    if (!message.active) return;
+    alert("new video");
+    chrome.runtime.sendMessage({
+      action: "showConvertedOptions",
       mp3: mp3FormatOptions,
       mp4: mp4FormatOptions,
     });
   }
 
-  if (message.action == "showConvertedOptions") {
+  if (message.action === "showConvertedOptions") {
     if (!CurrentVideoId) {
       const url = window.location.href;
       const videoId = getYouTubeVideoID(url);
-
       CurrentVideoId = videoId;
     }
 
-    if (mp3FormatOptions.length <= 0 || mp4FormatOptions.length <= 0)
+    if (mp3FormatOptions.length <= 0 || mp4FormatOptions.length <= 0) {
       await FetchingFormats(CurrentVideoId);
+    }
 
-    browser.runtime.sendMessage({
-      action: "ShowConvertedOptions",
+    alert("Showing converted options");
+
+    chrome.runtime.sendMessage({
+      action: "showConvertedOptions",
       mp3: mp3FormatOptions,
       mp4: mp4FormatOptions,
     });
   }
 
-  if (message.action == "GetInfoOfDownload") {
+  if (message.action === "GetInfoOfDownload") {
     const format = parseMediaString(message.format);
+    alert("video downloading please wait a few seconds");
 
-    browser.runtime.sendMessage({
+    return chrome.runtime.sendMessage({
       action: "DownloadVideo",
       videoId: CurrentVideoId,
       format,
@@ -50,6 +54,9 @@ async function FetchingFormats(video) {
   const mp4FormatsFetch = await fetch(
     `http://localhost:3000/api/${video}/youtube/info`
   );
+
+  if (!mp4FormatsFetch.ok)
+    throw new Error(`HTTP error! Status: ${mp4FormatsFetch.status}`);
 
   const mp4FormatResults = await mp4FormatsFetch.json();
 
@@ -65,6 +72,9 @@ async function FetchingFormats(video) {
   const mp3FormatsFetch = await fetch(
     `http://localhost:3000/api/${video}/youtube/info?audioOnly=true`
   );
+
+  if (!mp3FormatsFetch.ok)
+    throw new Error(`HTTP error! Status: ${mp3FormatsFetch.status}`);
 
   const mp3FormatResults = await mp3FormatsFetch.json();
 
